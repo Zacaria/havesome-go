@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+
+engine.wasm
+wasm_exec.js
+
+node_modules/
+code-block.bundle.js
