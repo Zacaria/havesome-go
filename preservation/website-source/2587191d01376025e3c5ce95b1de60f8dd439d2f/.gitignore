@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+
+engine.wasm
+wasm_exec.js
