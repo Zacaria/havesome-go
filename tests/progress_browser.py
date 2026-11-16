@@ -19,15 +19,16 @@ with sync_playwright() as p:
         assert page.locator('aside [aria-current="location"]').get_attribute('href') == '#sources'
         assert page.locator('aside').bounding_box()['y'] < 844
         page.goto(url + '#api', wait_until='networkidle')
-        assert page.locator('aside [aria-current="location"]').get_attribute('href') == '#api'
+        page.wait_for_function('document.querySelector(\'aside [aria-current="location"]\')?.getAttribute("href") === "#api"')
         page.locator('aside a[href="#concurrence"]').focus()
         page.keyboard.press('Enter')
         page.wait_for_timeout(100)
         assert page.locator('aside [aria-current="location"]').get_attribute('href') == '#concurrence'
-        assert page.locator('[data-slot="code-block"]').count() == 6
+        assert page.locator('article [data-slot="code-block"]:not(.playground-block)').count() == 6
         assert page.locator('.playground textarea').count() == 2
-        button = page.locator('[data-slot="code-block-copy-button"]').first
-        expected = page.locator('[data-slot="code-block-content"]').first.inner_text()
+        static_block = page.locator('article [data-slot="code-block"]:not(.playground-block)').first
+        button = static_block.locator('[data-slot="code-block-copy-button"]')
+        expected = static_block.locator('[data-slot="code-block-content"]').inner_text()
         button.click()
         assert page.evaluate('navigator.clipboard.readText()') == expected
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')

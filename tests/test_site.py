@@ -38,7 +38,7 @@ class SiteTest(unittest.TestCase):
         for text in ('WebAssembly', 'interpréteur', 'application/', 'domain/', 'infrastructure/', 'TDD'):
             self.assertIn(text, page)
         self.assertTrue((ROOT / 'playground' / 'go.mod').exists())
-        self.assertTrue((ROOT / 'playground.js').exists())
+        self.assertTrue((ROOT / 'code-block-entry.tsx').exists())
 
     def test_library_logo_and_attribution_are_in_the_visible_guide(self):
         page = (ROOT / 'index.html').read_text(encoding='utf8')
