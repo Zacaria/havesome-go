@@ -5,4 +5,5 @@ engine.wasm
 wasm_exec.js
 
 node_modules/
+dist/
 code-block.bundle.js

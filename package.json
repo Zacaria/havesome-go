@@ -2,15 +2,32 @@
   "name": "havesome-go-ui",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "build": "esbuild code-block-entry.tsx --bundle --minify --format=iife --target=es2020 --outfile=code-block.bundle.js"
+    "dev": "vp dev",
+    "build": "vp build",
+    "preview": "vp preview",
+    "check": "vp check button.tsx code-block.tsx code-block-entry.tsx fiche-entry.tsx utils.ts vite.config.ts tsconfig.json && tsc --noEmit"
   },
   "dependencies": {
+    "@base-ui/react": "1.9.0",
     "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "tailwind-merge": "3.5.0"
   },
   "devDependencies": {
-    "esbuild": "0.25.12"
+    "@tailwindcss/vite": "4.3.5",
+    "@types/node": "24.19.2",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "tailwindcss": "4.3.5",
+    "typescript": "5.9.3",
+    "vite-plus": "1.6.0"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.6.0",
+    "vitest": "5.1.0"
   }
 }

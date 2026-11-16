@@ -3,20 +3,123 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Les idées et commandes essentielles pour travailler en Go.">
-<title>Fiche mémo Go — HaveSome Go</title><link rel="icon" href="gopher-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="navigation.css"><link rel="stylesheet" href="fiche.css"><script src="fiche.js" defer></script>
+<title>Fiche mémo Go — HaveSome Go</title><link rel="icon" href="gopher-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="navigation.css"><link rel="stylesheet" href="fiche.css"><script type="module" src="/fiche-entry.tsx"></script>
 </head>
 <body>
 <a class="skip" href="#contenu">Aller au contenu</a>
 <header class="mast"><a class="brand" href="index.html">have<span>some</span> / go</a><nav class="mast-links" aria-label="Liens rapides"><a href="index.html">Le guide</a><a href="https://github.com/Zacaria/havesome-go">Améliorer le guide ↗</a></nav></header>
 <main id="contenu" class="sheet">
-<div class="sheet-hero"><div><p class="eyebrow">GARDER L’ESSENTIEL SOUS LA MAIN</p><h1>Go, en <em>mémo.</em></h1><p>Des idées simples, des outils solides : les repères pour écrire et relire du Go.</p><a href="#commandes">Aller aux commandes ↓</a></div><img src="cheatsheet-art.png" alt="" width="1536" height="1024"></div>
+<div class="sheet-hero"><div><p class="eyebrow">GARDER L’ESSENTIEL SOUS LA MAIN</p><h1>Go, en <em>mémo.</em></h1><p>Des idées simples, des outils solides : les repères pour écrire et relire du Go.</p><a href="#syntaxe">Aller à la syntaxe ↓</a> · <a href="#commandes">Aller aux commandes ↓</a></div><img src="cheatsheet-art.png" alt="" width="1536" height="1024"></div>
 <div class="sheet-grid">
 <section><p class="chapter">01 / L’ESPRIT</p><h2>Explicite avant ingénieux.</h2><ul><li>Privilégiez un code lisible et des noms clairs ; laissez <code>gofmt</code> régler la mise en forme.</li><li>Commencez par la bibliothèque standard. Ajoutez une dépendance pour un besoin réel.</li><li>Les erreurs sont des valeurs : traitez-les ou ajoutez du contexte avant de les transmettre.</li></ul></section>
 <section><p class="chapter">02 / LES VALEURS</p><h2>Comprendre ce qui se copie.</h2><ul><li>Une affectation copie la valeur ; une slice copiée peut partager son tableau sous-jacent. Réaffectez le résultat de <code>append</code>.</li><li>Un type satisfait implicitement une interface par ses méthodes. Une interface contenant un pointeur nil typé n’est pas nil.</li><li><code>defer</code> appelle à la sortie de la fonction, dans l’ordre inverse ; ses arguments sont évalués immédiatement.</li></ul></section>
 <section><p class="chapter">03 / CONCURRENCE</p><h2>Prévoir la fin.</h2><ul><li>Une goroutine permet la concurrence, pas une accélération garantie.</li><li>Canal ou mutex : choisissez selon la propriété des données. Pour chaque goroutine, prévoyez attente et annulation.</li><li><code>context</code> transmet annulation et échéance aux opérations qui l’observent.</li></ul></section>
 <section><p class="chapter">04 / AUX FRONTIÈRES</p><h2>Rendre les risques visibles.</h2><ul><li>Enveloppez avec <code>%w</code> seulement si exposer l’erreur sous-jacente fait partie du contrat ; utilisez <code>errors.Is</code> ou <code>errors.As</code>.</li><li>En réseau, fixez des délais, limitez les entrées et fermez les corps de réponse.</li><li>Le détecteur de races observe uniquement les chemins exécutés ; un test vert ne prouve pas l’absence de défauts.</li></ul></section>
 </div>
-<section id="commandes" class="sheet-commands"><p class="chapter">05 / LA BOUCLE</p><h2>Quelques commandes à portée de main.</h2><p>Dans un module Go de confiance. Les tests exécutent du code ; <code>go test -race</code> nécessite une plateforme prise en charge.</p>
+<section class="sheet-reference" id="syntaxe">
+<p class="chapter">LA SYNTAXE / EN UN COUP D’ŒIL</p><h2>Du code à portée de main.</h2>
+<p>Chaque exemple est un petit programme indépendant. Les déclarations courtes avec <code>:=</code> s’utilisent dans une fonction.</p>
+<nav aria-label="Accès rapide à la syntaxe" class="sheet-index"><a href="#declarations">Déclarations</a><a href="#fonctions">Fonctions</a><a href="#collections">Collections</a><a href="#flux">Contrôle de flux</a><a href="#types">Structs et interfaces</a><a href="#erreurs">Erreurs</a><a href="#concurrence-syntaxe">Concurrence</a><a href="#commandes">Commandes</a></nav>
+<div class="syntax-grid">
+<section id="declarations"><h3>Déclarer et convertir</h3><p><code>var</code> donne une valeur zéro ; <code>:=</code> déduit le type. Une conversion est explicite.</p><pre data-go-example="declarations" data-output="0 3 3 4&#10;"><code>package main
+
+import "fmt"
+
+func main() {
+    var zero int
+    count := 3
+    const step = 1
+    decimal := float64(count)
+    fmt.Println(zero, count, decimal, count+step)
+}</code></pre></section>
+<section id="fonctions"><h3>Fonctions et retours</h3><p>Une fonction peut retourner plusieurs valeurs. <code>defer</code> s’exécute au retour, en ordre inverse.</p><pre data-go-example="fonctions" data-output="6 true&#10;terminé&#10;"><code>package main
+
+import "fmt"
+
+func double(n int) (int, bool) {
+    return n * 2, n &gt; 0
+}
+func main() {
+    defer fmt.Println("terminé")
+    valeur, positif := double(3)
+    fmt.Println(valeur, positif)
+}</code></pre></section>
+<section id="collections"><h3>Tableau, slice, map</h3><p>Le tableau a une taille fixe ; la slice peut partager son stockage. Une clé absente renvoie la valeur zéro et <code>ok == false</code>.</p><pre data-go-example="collections" data-output="[2 4] [2 4 6] 0 false&#10;"><code>package main
+
+import "fmt"
+
+func main() {
+    tableau := [2]int{2, 4}
+    nombres := []int{2, 4}
+    nombres = append(nombres, 6)
+    scores := map[string]int{"Ada": 8}
+    score, ok := scores["Lin"]
+    fmt.Println(tableau, nombres, score, ok)
+}</code></pre></section>
+<section id="flux"><h3>If, for, switch</h3><p><code>for</code> est la seule boucle ; <code>range</code> parcourt ici indices et valeurs.</p><pre data-go-example="flux" data-output="0 2&#10;1 5&#10;grand&#10;"><code>package main
+
+import "fmt"
+
+func main() {
+    for i, n := range []int{2, 5} {
+        fmt.Println(i, n)
+    }
+    if n := 5; n &gt; 0 {
+        switch {
+        case n &gt; 3:
+            fmt.Println("grand")
+        default:
+            fmt.Println("petit")
+        }
+    }
+}</code></pre></section>
+<section id="types"><h3>Struct, méthode, interface</h3><p>Pas de déclaration « implements » : le type satisfait l’interface par ses méthodes.</p><pre data-go-example="types" data-output="Bonjour, Ada&#10;"><code>package main
+
+import "fmt"
+
+type Personne struct { Nom string }
+type Salueur interface { Saluer() string }
+
+func (p Personne) Saluer() string {
+    return "Bonjour, " + p.Nom
+}
+func main() {
+    var s Salueur = Personne{Nom: "Ada"}
+    fmt.Println(s.Saluer())
+}</code></pre></section>
+<section id="erreurs"><h3>Retourner une erreur</h3><p>Traitez l’erreur avant d’utiliser le résultat ; <code>%w</code> conserve la cause pour <code>errors.Is</code>.</p><pre data-go-example="erreurs" data-output="true&#10;"><code>package main
+
+import (
+    "errors"
+    "fmt"
+)
+
+var ErrAbsent = errors.New("absent")
+
+func charger() error {
+    return fmt.Errorf("charger : %w", ErrAbsent)
+}
+func main() {
+    err := charger()
+    if err != nil {
+        fmt.Println(errors.Is(err, ErrAbsent))
+    }
+}</code></pre></section>
+<section id="concurrence-syntaxe"><h3>Goroutine et canal</h3><p>La réception attend un envoi. En production, prévoyez aussi l’annulation et la fin de chaque goroutine.</p><pre data-go-example="concurrence" data-output="prêt&#10;"><code>package main
+
+import "fmt"
+
+func main() {
+    messages := make(chan string)
+    go func() { messages &lt;- "prêt" }()
+    fmt.Println(&lt;-messages)
+}</code></pre></section>
+</div></section>
+<section id="commandes" class="sheet-commands"><p class="chapter">05 / LA BOUCLE</p><h2>Quelques commandes à portée de main.</h2><p>Dans un module Go de confiance : exécuter ou tester lance du code. <code>go test -race</code> nécessite une plateforme prise en charge.</p>
+<div class="command"><div><code>go run .</code><span>Compiler et exécuter le package courant.</span></div><button type="button" data-copy="go run ." aria-label="Copier go run .">Copier</button></div>
+<div class="command"><div><code>go fmt ./...</code><span>Formater les packages du module.</span></div><button type="button" data-copy="go fmt ./..." aria-label="Copier go fmt ./...">Copier</button></div>
+<div class="command"><div><code>go mod tidy</code><span>Synchroniser les dépendances ; modifie go.mod et go.sum si nécessaire.</span></div><button type="button" data-copy="go mod tidy" aria-label="Copier go mod tidy">Copier</button></div>
+<div class="command"><div><code>go doc fmt.Println</code><span>Afficher la documentation d’un symbole.</span></div><button type="button" data-copy="go doc fmt.Println" aria-label="Copier go doc fmt.Println">Copier</button></div>
 <div class="command"><div><code>go test ./...</code><span>Tester les packages du module.</span></div><button type="button" data-copy="go test ./..." aria-label="Copier go test ./...">Copier</button></div>
 <div class="command"><div><code>go test -race ./...</code><span>Détecter des races sur les chemins exécutés.</span></div><button type="button" data-copy="go test -race ./..." aria-label="Copier go test -race ./...">Copier</button></div>
 <div class="command"><div><code>go vet ./...</code><span>Signaler certaines constructions suspectes.</span></div><button type="button" data-copy="go vet ./..." aria-label="Copier go vet ./...">Copier</button></div>

@@ -4,7 +4,7 @@ from playwright.sync_api import sync_playwright
 
 url = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:18979/'
 with sync_playwright() as p:
-    browser = p.chromium.launch(executable_path='/usr/bin/brave-browser', headless=True, args=['--no-sandbox'])
+    browser = p.chromium.launch(executable_path='/usr/bin/brave-browser', headless=True, chromium_sandbox=True)
     for width in (320, 390, 800, 1440):
         page = browser.new_page(viewport={'width': width, 'height': 844}, reduced_motion='reduce', permissions=['clipboard-read', 'clipboard-write'])
         page.goto(url, wait_until='load')
@@ -12,7 +12,9 @@ with sync_playwright() as p:
         for block in page.locator('.playground').all():
             editor = block.locator('textarea')
             content = block.locator('[data-slot="code-block-content"]')
-            assert block.locator('[data-slot="code-block-header"] [data-slot="code-block-copy-button"]').count() == 1
+            copy = block.locator('[data-slot="code-block-header"] [data-slot="code-block-copy-button"]')
+            assert copy.count() == 1
+            assert copy.evaluate('e => e.scrollWidth <= e.clientWidth'), 'Le bouton Copier est tronqué'
             assert block.locator('[data-slot="code-block-header"]').get_by_role('button', name='Exécuter').count() == 1
             editor.fill('package main\n' + '\n'.join('line%02d abcdefghijklmnopqrstuvwxyz 0123456789' % i for i in range(35)))
             content.locator('[data-slot="code-block-line"]').last.wait_for()

@@ -3,7 +3,7 @@ import sys
 
 url = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:18765/'
 with sync_playwright() as p:
-    browser = p.chromium.launch(executable_path='/usr/bin/brave-browser', headless=True, args=['--no-sandbox'])
+    browser = p.chromium.launch(executable_path='/usr/bin/brave-browser', headless=True, chromium_sandbox=True)
     for width in (1440, 390, 320):
         page = browser.new_page(viewport={'width': width, 'height': 844}, reduced_motion='reduce', permissions=['clipboard-read', 'clipboard-write'])
         page.goto(url, wait_until='networkidle')

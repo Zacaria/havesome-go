@@ -1,23 +1,48 @@
 # HaveSome Go
 
-Guide francophone pour développeurs expérimentés : notions, choix de conception, écosystème et pratiques junior/senior. Les explications restent consultables sans JavaScript.
+Guide francophone pour développeurs expérimentés : notions, choix de conception, écosystème et pratiques junior/senior. Les explications et le code initial restent consultables sans JavaScript. La fiche `fiche.html` réunit les principes, des exemples de syntaxe Go autonomes et les commandes courantes en texte sélectionnable. Ses exemples sont extraits et exécutés par les tests ; les sorties attendues sont vérifiées avec Go.
 
-## Expérience et exécution
+## Développement
 
-La navigation, les cartes et les schémas privilégient des parcours courts ; les détails restent dans le guide. Les exemples interactifs utilisent Yaegi, un interpréteur Go exécuté dans un Web Worker local avec WebAssembly : il ne s’agit pas du compilateur officiel et il ne prend pas en charge tout Go. Aucun code n’est envoyé à un serveur pour être exécuté ; les ressources du site sont toutefois téléchargées à l’ouverture. Le worker est interrompu après un délai limité. N’exécutez que du code de confiance.
+Prérequis : Node.js 24.11 ou plus récent, npm et Go 1.27.4. Depuis la racine :
 
-Le gopher et son icône sont des illustrations de Renee French, non modifiées, issues de `https://go.dev/doc/gopher/frontpage.png` et `https://go.dev/doc/gopher/favicon.svg` et distribuée sous CC BY 4.0 (`https://go.dev/doc/gopher/README`). Le logo Gin-Gonic non modifié est de Javier Provecho, avec les yeux du gopher de Renee French : source `https://github.com/gin-gonic/logo`, licence CC BY 4.0 pour le logo (yeux : CC BY 3.0 selon la source). Il identifie le framework Gin sans suggérer une affiliation. Les licences de Yaegi et Go sont dans `licenses/` ; les sources techniques sont liées depuis le guide. Le site est publié sur https://havesome-go.vercel.app/ par déploiement Vercel statique manuel. Ce dépôt dédié n’est pas relié au projet Vercel : y pousser du code ne met pas le site à jour. Un nouveau déploiement exige une action explicite sur le projet existant.
+```sh
+npm ci --workspaces=false
+GOFLAGS=-buildvcs=false go -C playground generate ./...
+npm run dev
+```
 
-La navigation indique la dernière section ayant atteint la ligne de lecture et reste accessible pendant le défilement sur mobile. Les exemples statiques utilisent le composant React Code Block officiel de shadcn/ui, adapté aux couleurs du guide. Les ateliers composent les mêmes composants CodeBlock, Header, Title, Actions, CopyButton et Content avec un textarea natif accessible : CodeBlockContent affiche le code coloré et les numéros, tandis que le textarea assure l’édition et synchronise son défilement. Le Code Block officiel est un affichage, pas un éditeur ; cette superposition est une adaptation propre au site. Sans JavaScript, les exemples et le code initial restent lisibles et le sommaire reste utilisable.
+Ouvrez l'URL locale affichée par Vite+. Le moteur est généré depuis les sources épinglées de `playground` ; la première compilation nécessite l'accès au proxy Go. `GOFLAGS` évite d'inclure les métadonnées Git dans le binaire. Les fichiers `engine.wasm` et `wasm_exec.js` sont générés, non suivis ; ils sont indispensables aux ateliers et au build.
 
-Pour construire les blocs : `npm ci --workspaces=false && npm run build --workspaces=false` dans ce dossier. Le composant est issu du registre officiel shadcn/ui (base-nova) ; ses imports et libellés ont été adaptés à cette page statique sans Tailwind. Le fichier construit `code-block.bundle.js` est un artefact non suivi et doit être présent pour le déploiement.
+Vite+ est installé localement, sans modifier la CLI ou le runtime globaux. Les overrides npm suivent ses versions de Vite et Vitest ; les maintenir alignées avec `npm exec -- vp toolchain vitest` lors d'une mise à jour. Les composants Code Block et Button proviennent du registre officiel shadcn/ui, style base-nova ; leurs imports, libellés et styles ont été adaptés à l'identité du guide. Code Block affiche le code coloré ; un textarea natif accessible superposé permet l'édition. Il ne s'agit pas d'un éditeur shadcn prêt à l'emploi.
 
-## Fiche mémo
+## Construire et vérifier
 
-La fiche `fiche.html` rassemble les principes et commandes Go sous forme de texte sélectionnable. Les boutons copient les commandes lorsque le navigateur autorise l’accès au presse-papiers ; sinon, sélectionnez le texte. Les commandes s’exécutent dans un module Go de confiance et peuvent lancer du code de test. Le lien de contribution pointe vers ce dépôt dédié.
+```sh
+npm run build
+npm run check
+python3 -m unittest discover -s tests
+python3 -m http.server 39523 --bind 127.0.0.1 --directory dist
+```
 
-## Vérifier localement
+Dans un autre terminal, avec Brave et Playwright Python installés :
 
-Depuis ce dossier : `python3 -m unittest discover -s tests`, puis `python3 -m http.server`. Régénérer les extraits depuis la page avec `python3 tests/extract_examples.py`, puis exécuter `go -C examples test -race ./...`, `go -C examples vet ./...` et `go -C examples build ./...`.
+```sh
+for test in browser progress_browser cheatsheet_browser editor_browser interactive_browser; do
+  python3 "tests/$test.py" http://127.0.0.1:39523/
+done
+```
 
-Le moteur WebAssembly est généré à partir des sources épinglées du dossier `playground` avec `GOFLAGS=-buildvcs=false go -C playground generate ./...` ; il faut Go 1.27.4 et un accès au proxy de modules pour la première compilation. L’option désactive l’inclusion des métadonnées Git et permet de reproduire les octets du moteur actuellement publié. Les artefacts générés ne sont pas suivis par Git et doivent être reconstruits avant la vérification navigateur et le déploiement.
+Les scripts utilisent Brave en mode headless avec son sandbox. Adapter le chemin `/usr/bin/brave-browser` dans les scripts si nécessaire. Pour vérifier les exemples Go, régénérer les extraits avec `python3 tests/extract_examples.py`, puis lancer `go -C examples test -race ./...`, `go -C examples vet ./...` et `go -C examples build ./...`. Les tests du moteur se lancent avec `go -C playground test ./...`.
+
+## Contribuer et publier
+
+Proposez une modification dans une branche et une pull request sur [le dépôt HaveSome Go](https://github.com/Zacaria/havesome-go). Vérifiez les commandes ci-dessus et les parcours concernés, notamment la navigation, la copie et les deux ateliers sur mobile et ordinateur. Les commandes de la fiche s'exécutent dans un module Go de confiance et peuvent lancer du code de test.
+
+Le site existant est publié sur https://havesome-go.vercel.app/ par déploiement Vercel statique manuel ; ce dépôt n'est pas relié au projet Vercel, donc un push ne publie pas le site. Après revue et vérification de l'absence de publication concurrente, publier le contenu complet de `dist/` sur le projet existant, puis contrôler les pages, liens et ateliers publics. Ne pas publier les sources ou un build sans moteur WebAssembly.
+
+## Exécution et crédits
+
+Les exemples interactifs utilisent Yaegi, interpréteur Go exécuté dans un Web Worker local avec WebAssembly : ce n'est pas le compilateur officiel et tout Go n'est pas pris en charge. Aucun code n'est envoyé à un serveur pour être exécuté ; les ressources du site sont téléchargées à l'ouverture. Le worker est interrompu après un délai limité. N'exécutez que du code de confiance. La copie de la fiche nécessite l'accès au presse-papiers ; sinon, sélectionnez le texte.
+
+Le gopher et son icône sont des illustrations non modifiées de Renee French, issues de https://go.dev/doc/gopher/frontpage.png et https://go.dev/doc/gopher/favicon.svg et distribuées sous CC BY 4.0 (https://go.dev/doc/gopher/README). Le logo Gin-Gonic non modifié est de Javier Provecho, avec les yeux du gopher de Renee French : source https://github.com/gin-gonic/logo, licence CC BY 4.0 pour le logo (yeux : CC BY 3.0 selon la source). Il identifie Gin sans suggérer une affiliation. Les licences de Yaegi et Go sont dans `licenses/`.

@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 
 url = sys.argv[1] if len(sys.argv) > 1 else 'http://127.0.0.1:18768/'
 with sync_playwright() as p:
-    browser = p.chromium.launch(executable_path='/usr/bin/brave-browser', headless=True, args=['--no-sandbox'])
+    browser = p.chromium.launch(executable_path='/usr/bin/brave-browser', headless=True, chromium_sandbox=True)
     for width in (320, 390, 800, 1440):
         page = browser.new_page(viewport={'width': width, 'height': 900}, reduced_motion='reduce')
         errors = []
@@ -52,7 +52,7 @@ with sync_playwright() as p:
     assert fallback.locator('#code-valeur').evaluate("e => getComputedStyle(e).webkitTextFillColor") != 'rgba(0, 0, 0, 0)'
     fallback.close()
     fallback = browser.new_page()
-    fallback.route('**/code-block.bundle.js', lambda route: route.abort())
+    fallback.route('**/assets/index-*.js', lambda route: route.abort())
     fallback.goto(url)
     assert fallback.locator('#code-valeur').evaluate("e => getComputedStyle(e).webkitTextFillColor") != 'rgba(0, 0, 0, 0)'
     fallback.close()
