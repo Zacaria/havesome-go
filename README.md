@@ -12,6 +12,10 @@ La navigation indique la dernière section ayant atteint la ligne de lecture et 
 
 Pour construire les blocs : `npm ci --workspaces=false && npm run build --workspaces=false` dans ce dossier. Le composant est issu du registre officiel shadcn/ui (base-nova) ; ses imports et libellés ont été adaptés à cette page statique sans Tailwind. Le fichier construit `code-block.bundle.js` est un artefact non suivi et doit être présent pour le déploiement.
 
+## Fiche mémo
+
+La fiche `fiche.html` rassemble les principes et commandes Go sous forme de texte sélectionnable. Les boutons copient les commandes lorsque le navigateur autorise l’accès au presse-papiers ; sinon, sélectionnez le texte. Les commandes s’exécutent dans un module Go de confiance et peuvent lancer du code de test. Le lien de contribution pointe vers ce dépôt dédié.
+
 ## Vérifier localement
 
 Depuis ce dossier : `python3 -m unittest discover -s tests`, puis `python3 -m http.server`. Régénérer les extraits depuis la page avec `python3 tests/extract_examples.py`, puis exécuter `go -C examples test -race ./...`, `go -C examples vet ./...` et `go -C examples build ./...`.

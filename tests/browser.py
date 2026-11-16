@@ -13,7 +13,7 @@ with sync_playwright() as p:
         assert page.locator('h1').inner_text().startswith('Go, sans')
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'overflow {width}'
         for anchor in ('philosophie', 'valeurs', 'api', 'concurrence', 'outils', 'production', 'senior', 'sources'):
-            page.locator('nav a[href="#' + anchor + '"]').click()
+            page.locator('aside nav a[href="#' + anchor + '"]').click()
             assert page.evaluate('location.hash') == '#' + anchor
             box = page.locator('#' + anchor).bounding_box()
             assert box is not None and box['y'] < page.viewport_size['height'], (width, anchor, box)

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Les idées et commandes essentielles pour travailler en Go.">
+<title>Fiche mémo Go — HaveSome Go</title><link rel="icon" href="gopher-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="navigation.css"><link rel="stylesheet" href="fiche.css"><script src="fiche.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header class="mast"><a class="brand" href="index.html">have<span>some</span> / go</a><nav class="mast-links" aria-label="Liens rapides"><a href="index.html">Le guide</a><a href="https://github.com/Zacaria/havesome-go">Améliorer le guide ↗</a></nav></header>
+<main id="contenu" class="sheet">
+<div class="sheet-hero"><div><p class="eyebrow">GARDER L’ESSENTIEL SOUS LA MAIN</p><h1>Go, en <em>mémo.</em></h1><p>Des idées simples, des outils solides : les repères pour écrire et relire du Go.</p><a href="#commandes">Aller aux commandes ↓</a></div><img src="cheatsheet-art.png" alt="" width="1536" height="1024"></div>
+<div class="sheet-grid">
+<section><p class="chapter">01 / L’ESPRIT</p><h2>Explicite avant ingénieux.</h2><ul><li>Privilégiez un code lisible et des noms clairs ; laissez <code>gofmt</code> régler la mise en forme.</li><li>Commencez par la bibliothèque standard. Ajoutez une dépendance pour un besoin réel.</li><li>Les erreurs sont des valeurs : traitez-les ou ajoutez du contexte avant de les transmettre.</li></ul></section>
+<section><p class="chapter">02 / LES VALEURS</p><h2>Comprendre ce qui se copie.</h2><ul><li>Une affectation copie la valeur ; une slice copiée peut partager son tableau sous-jacent. Réaffectez le résultat de <code>append</code>.</li><li>Un type satisfait implicitement une interface par ses méthodes. Une interface contenant un pointeur nil typé n’est pas nil.</li><li><code>defer</code> appelle à la sortie de la fonction, dans l’ordre inverse ; ses arguments sont évalués immédiatement.</li></ul></section>
+<section><p class="chapter">03 / CONCURRENCE</p><h2>Prévoir la fin.</h2><ul><li>Une goroutine permet la concurrence, pas une accélération garantie.</li><li>Canal ou mutex : choisissez selon la propriété des données. Pour chaque goroutine, prévoyez attente et annulation.</li><li><code>context</code> transmet annulation et échéance aux opérations qui l’observent.</li></ul></section>
+<section><p class="chapter">04 / AUX FRONTIÈRES</p><h2>Rendre les risques visibles.</h2><ul><li>Enveloppez avec <code>%w</code> seulement si exposer l’erreur sous-jacente fait partie du contrat ; utilisez <code>errors.Is</code> ou <code>errors.As</code>.</li><li>En réseau, fixez des délais, limitez les entrées et fermez les corps de réponse.</li><li>Le détecteur de races observe uniquement les chemins exécutés ; un test vert ne prouve pas l’absence de défauts.</li></ul></section>
+</div>
+<section id="commandes" class="sheet-commands"><p class="chapter">05 / LA BOUCLE</p><h2>Quelques commandes à portée de main.</h2><p>Dans un module Go de confiance. Les tests exécutent du code ; <code>go test -race</code> nécessite une plateforme prise en charge.</p>
+<div class="command"><div><code>go test ./...</code><span>Tester les packages du module.</span></div><button type="button" data-copy="go test ./..." aria-label="Copier go test ./...">Copier</button></div>
+<div class="command"><div><code>go test -race ./...</code><span>Détecter des races sur les chemins exécutés.</span></div><button type="button" data-copy="go test -race ./..." aria-label="Copier go test -race ./...">Copier</button></div>
+<div class="command"><div><code>go vet ./...</code><span>Signaler certaines constructions suspectes.</span></div><button type="button" data-copy="go vet ./..." aria-label="Copier go vet ./...">Copier</button></div>
+<div class="command"><div><code>go build ./...</code><span>Compiler les packages.</span></div><button type="button" data-copy="go build ./..." aria-label="Copier go build ./...">Copier</button></div>
+<p class="copy-status" role="status" aria-live="polite"></p><noscript><p>Sélectionnez une commande pour la copier.</p></noscript>
+</section>
+<section class="sheet-sources"><p class="chapter">POUR ALLER PLUS LOIN</p><h2>Les sources font foi.</h2><p><a href="https://go.dev/doc/effective_go">Effective Go</a> · <a href="https://go.dev/ref/spec">Spécification</a> · <a href="https://pkg.go.dev/cmd/go">Commandes Go</a> · <a href="https://go.dev/doc/articles/race_detector">Détecteur de races</a> · <a href="https://pkg.go.dev/context">context</a></p><p>Effective Go reste utile pour les idiomes de base, mais ne couvre pas les évolutions récentes comme les modules et les génériques.</p></section>
+</main>
+<footer><nav class="footer-links" aria-label="Liens utiles"><a href="index.html">Retour au guide</a><a href="https://github.com/Zacaria/havesome-go">Améliorer le guide sur GitHub ↗</a><a href="#contenu">↑ Retour en haut</a></nav><p>HaveSome Go · Une lecture pour construire avec discernement.</p></footer>
+</body></html>
